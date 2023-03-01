@@ -3,43 +3,40 @@
 
 <head>
     <title>Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta charset="utf-8">
     <script lang="text/javascript">
-        const t = async() => {
-            const optionalClientId = "optionalClientId"
-            const realtime = Ably.Realtime.Promise({ authUrl: `/auth/?client=${optionalClientId}` })
-            const channel = realtime.channels.get("[?rewind=100]default")
+        var channel = null
+        const t = async () => {
+            const user = prompt('Enter your name');
+            const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
+            channel = realtime.channels.get("[?rewind=100]default")
 
             await channel.subscribe((msg) => {
                 console.log("Ably message received", msg)
                 document.getElementById("response").innerHTML += "<br />" + JSON.stringify(msg)
             })
 
-            channel.publish("hello-world-message", { message: "Hello world!" })
+            channel.publish("greeting", user)
         }
     </script>
     <script lang="text/javascript" onload="t()" src="https://cdn.ably.com/lib/ably.min-1.js"></script>
-    <link rel="stylesheet" href="./styles.css">
+<!--    <link rel="stylesheet" href="./styles.css">-->
 </head>
-
 <body>
-<h1>Ably 💚 Netlify</h1>
-<div>
-    <p>
-        This application uses Netlify edge functions to host an API, and a plain HTML application to render the response.
-    </p>
-    <p>
-        We're using the Netlify serverless function to manage an Ably API Key - there is a tokenRequest API that serves on /.netlify/functions/ably-tokenRequest that provides
-        the in-browser SDK with your API key.
-    </p>
-    <p>
-        Once this page loads, it'll connect to an ably channel, and send a message - the raw messages will appear below:
-    </p>
-</div>
-<div id="response">
-    <h2>Ably messages will append here.</h2>
-</div>
-</body>
+    <div id="app">Chat App</div>
+    <form id="message-form">
+        <input type="text" name="message" placeholder="Enter message">
+        <button>Send</button>
+    </form>
+    <button id="send-location">Send Location</button>
 
+    <script lang="text/javascript">
+        document.querySelector('#message-form').addEventListener('submit', (e) => {
+            e.preventDefault()
+            const message = e.target.elements.message.value
+            channel.publish("message", message)
+        })
+    </script>
+</body>
 </html>
