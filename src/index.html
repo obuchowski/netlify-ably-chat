@@ -5,38 +5,99 @@
     <title>Example</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta charset="utf-8">
-    <script lang="text/javascript">
-        var channel = null
-        const t = async () => {
-            const user = prompt('Enter your name');
-            const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
-            channel = realtime.channels.get("[?rewind=100]default")
-
-            await channel.subscribe((msg) => {
-                console.log("Ably message received", msg)
-                document.getElementById("response").innerHTML += "<br />" + JSON.stringify(msg)
-            })
-
-            channel.publish("greeting", user)
-        }
-    </script>
-    <script lang="text/javascript" onload="t()" src="https://cdn.ably.com/lib/ably.min-1.js"></script>
-<!--    <link rel="stylesheet" href="./styles.css">-->
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <div id="app">Chat App</div>
-    <form id="message-form">
-        <input type="text" name="message" placeholder="Enter message">
-        <button>Send</button>
-    </form>
-    <button id="send-location">Send Location</button>
+<div class="chat">
+<!--    <div class="chat__sidebar" id="sidebar">-->
 
-    <script lang="text/javascript">
-        document.querySelector('#message-form').addEventListener('submit', (e) => {
-            e.preventDefault()
-            const message = e.target.elements.message.value
-            channel.publish("message", message)
+    </div>
+    <div class="chat__main">
+        <div id="messages" class="chat__messages"></div>
+        <div class="compose">
+            <form id="message-form">
+                <input name="message" type="text" placeholder="Message" autocomplete="off" required>
+                <button>Send</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- Templates -->
+<script id="message-template" type="text/html">
+    <div class="message">
+        <p>
+            <span class="message__name">{{username}}</span>
+            <span class="message__meta">{{createdAt}}</span>
+        </p>
+        <p> {{message}}</p>
+    </div>
+</script>
+
+<script lang="text/javascript">
+    var $messages = document.querySelector('#messages')
+    var messageTemplate = document.querySelector('#message-template').innerHTML
+
+    var autoscroll = () => {
+        // New message element
+        const $newMessage = $messages.lastElementChild;
+        // Height of the new message
+        const newMessageStyles = getComputedStyle($newMessage);
+        const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+        const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+        // Visible height
+        const visibleHeight = $messages.offsetHeight
+        // Height of messages container
+        const containerHeight = $messages.scrollHeight;
+        // How far have the user scrolled
+        const scrollOffset = $messages.scrollTop + visibleHeight;
+
+        if (containerHeight - newMessageHeight <= scrollOffset) {
+            $messages.scrollTop = $messages.scrollHeight;
+        }
+    }
+
+    var channel = null
+    const t = async () => {
+        const user = prompt('Enter your name');
+        if (!user) {
+            alert('Please enter your name')
+            location.reload()
+        }
+        const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
+        channel = realtime.channels.get("[?rewind=100]default-channel")
+
+        await channel.subscribe((msg) => {
+            console.log("Ably message received", msg)
+            document.getElementById("response").innerHTML += "<br />" + JSON.stringify(msg)
         })
-    </script>
+
+        await channel.subscribe('message', (msg) => {
+            const html = Mustache.render(messageTemplate, {
+                username: msg.clientId,
+                message: msg.data,
+                createdAt: moment(Date.now()).format('HH:mm:ss')
+            });
+            $messages.insertAdjacentHTML('beforeend', html);
+            autoscroll();
+        });
+
+        channel.publish("greeting", user)
+    }
+</script>
+
+<script lang="text/javascript" onload="t()" src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+
+<script lang="text/javascript">
+    document.querySelector('#message-form').addEventListener('submit', (e) => {
+        e.preventDefault()
+        const message = e.target.elements.message.value
+        channel.publish("message", message)
+    })
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 </body>
 </html>
