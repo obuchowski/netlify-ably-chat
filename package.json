@@ -1,0 +1,21 @@
+{
+  "name": "netlify-ably-chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obukhovski/netlify-ably-chat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/obukhovski/netlify-ably-chat/issues"
+  },
+  "homepage": "https://github.com/obukhovski/netlify-ably-chat#readme",
+  "devDependencies": {
+    "ably": "^1.2.37",
+    "dotenv-webpack": "^8.0.1",
+    "typescript": "^4.9.5"
+  }
+}

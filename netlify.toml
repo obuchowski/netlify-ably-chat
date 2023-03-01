@@ -1,3 +1,6 @@
+[build]
+publish = "src/"
+
 [[edge_functions]]
 function = "auth"
 path = "/auth"
