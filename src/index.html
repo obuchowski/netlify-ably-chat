@@ -18,7 +18,7 @@
         <div id="messages" class="chat__messages"></div>
         <div class="compose">
             <form id="message-form">
-                <input name="message" type="text" placeholder="Message" autocomplete="off" required>
+                <input id="messageInput" name="message" type="text" placeholder="Message" autocomplete="off" required>
                 <button>Send</button>
             </form>
         </div>
@@ -68,7 +68,7 @@
             location.reload()
         }
         const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
-        channel = realtime.channels.get("[?rewind=100]default-channel")
+        channel = realtime.channels.get("[?rewind=100]default")
 
         await channel.subscribe((msg) => {
             console.log("Ably message received", msg)
@@ -94,6 +94,7 @@
 <script lang="text/javascript">
     document.querySelector('#message-form').addEventListener('submit', (e) => {
         e.preventDefault()
+        document.getElementById("messageInput").value = ""
         const message = e.target.elements.message.value
         channel.publish("message", message)
     })
