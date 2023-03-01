@@ -44,6 +44,8 @@
     var autoscroll = () => {
         // New message element
         const $newMessage = $messages.lastElementChild;
+        $messages.scrollTop = $messages.scrollHeight;
+        return
         // Height of the new message
         const newMessageStyles = getComputedStyle($newMessage);
         const newMessageMargin = parseInt(newMessageStyles.marginBottom);
@@ -69,11 +71,6 @@
         }
         const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
         channel = realtime.channels.get("[?rewind=100]default-channel")
-
-        await channel.subscribe((msg) => {
-            console.log("Ably message received", msg)
-            document.getElementById("response").innerHTML += "<br />" + JSON.stringify(msg)
-        })
 
         await channel.subscribe('message', (msg) => {
             const html = Mustache.render(messageTemplate, {
