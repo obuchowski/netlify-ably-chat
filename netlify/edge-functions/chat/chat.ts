@@ -1,6 +1,6 @@
 import type { Context, Request } from "netlify:edge"
 // import * as Ably from "https://cdn.ably.com/lib/ably.min-1.js"
-import * as Ably from "npm:ably/promises"
+import * as Ably from "https://esm.sh/ably/promises"
 
 export default async (request: Request, context: Context) => {
     const ablyApiKey = Deno.env.get('ABLY_API_KEY')
@@ -14,7 +14,7 @@ export default async (request: Request, context: Context) => {
     const url = new URL(request.url)
     const clientId = url.searchParams.get('client') || Deno.env.get('DEFAULT_CLIENT_ID') || 'NO_CLIENT_ID'
     console.log(clientId)
-    const client = new Ably.Rest(ablyApiKey)
+    const client = new Ably.Rest({ key: ablyApiKey })
     const tokenRequestData = await client.auth.createTokenRequest({ clientId: clientId })
 
     return Response.json(tokenRequestData)
