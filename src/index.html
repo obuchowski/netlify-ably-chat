@@ -68,7 +68,7 @@
             location.reload()
         }
         const realtime = Ably.Realtime.Promise({authUrl: `/auth/?client=${user}`})
-        channel = realtime.channels.get("[?rewind=100]default")
+        channel = realtime.channels.get("[?rewind=100]default-channel")
 
         await channel.subscribe((msg) => {
             console.log("Ably message received", msg)
