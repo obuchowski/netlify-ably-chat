@@ -1,6 +1,7 @@
+// @ts-ignore
 import type { Context, Request } from "netlify:edge"
+// @ts-ignore
 import * as Ably from "https://esm.sh/ably/promises"
-// import * as Ably from "https://cdn.ably.com/lib/ably.min-1.js"
 
 export default async (request: Request, context: Context) => {
     const ablyApiKey = Deno.env.get('ABLY_API_KEY')

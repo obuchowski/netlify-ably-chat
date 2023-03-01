@@ -7,10 +7,9 @@
     <meta charset="utf-8">
     <script lang="text/javascript">
         const t = async() => {
-            console.log("Hi!🖤")
-            const optionalClientId = "optionalClientId" // When not provided in authUrl, a default will be used.
+            const optionalClientId = "optionalClientId"
             const realtime = Ably.Realtime.Promise({ authUrl: `/auth/?client=${optionalClientId}` })
-            const channel = realtime.channels.get("some-channel-name")
+            const channel = realtime.channels.get("[?rewind=100]default")
 
             await channel.subscribe((msg) => {
                 console.log("Ably message received", msg)
